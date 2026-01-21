@@ -2,14 +2,20 @@
 # exit on error
 set -o errexit
 
-# Install dependencies
 pip install -r requirements.txt
 
-# Collect static files
+# 1. Collect static files
 python manage.py collectstatic --no-input
 
-# Force create tables if they are missing
+# 2. Hard Reset: Clear migration history for the 'quiz' app
+# (This fixes the "No migrations to apply" while the DB is empty)
+python manage.py migrate --fake-initial
+
+# 3. The "Force" Command
 python manage.py migrate --run-syncdb
 
-# Create the admin user
+# 4. Final sync
+python manage.py migrate
+
+# 5. Create the admin user
 python create_admin.py
