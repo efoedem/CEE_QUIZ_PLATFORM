@@ -8,8 +8,8 @@ pip install -r requirements.txt
 # Collect static files
 python manage.py collectstatic --no-input
 
-# Run migrations to create database tables (Fixes the "auth_user" error)
-python manage.py migrate
+# Force create tables if they are missing
+python manage.py migrate --run-syncdb
 
-# Create the admin user automatically
+# Create the admin user
 python create_admin.py

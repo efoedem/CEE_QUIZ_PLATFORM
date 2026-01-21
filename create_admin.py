@@ -1,23 +1,25 @@
 import os
 import django
+from django.db import connection
 
-# Set the settings module
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'QUIZ_PLATFORM.settings')
 django.setup()
 
 from django.contrib.auth.models import User
 
-# --- CONFIGURE YOUR ADMIN HERE ---
-USERNAME = 'EDEM'
-PASSWORD = ''  # Change this!
-EMAIL = 'Titivate22@$'
-
 def create_admin():
-    if not User.objects.filter(username=USERNAME).exists():
-        User.objects.create_superuser(USERNAME, EMAIL, PASSWORD)
-        print(f"SUCCESSS: Superuser '{USERNAME}' created.")
-    else:
-        print(f"SKIP: Superuser '{USERNAME}' already exists.")
+    try:
+        # Check if the table exists before querying
+        if "auth_user" in connection.introspection.table_names():
+            if not User.objects.filter(username='admin').exists():
+                User.objects.create_superuser('admin', 'admin@example.com', 'YourSecurePassword123')
+                print("SUCCESS: Admin user created.")
+            else:
+                print("SKIP: Admin user already exists.")
+        else:
+            print("ERROR: Tables not found. Migration might have failed.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
 if __name__ == "__main__":
     create_admin()
