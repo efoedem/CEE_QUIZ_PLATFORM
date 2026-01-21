@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Submitted</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .result-card {
+            max-width: 600px;
+            margin: 80px auto;
+            border: none;
+            border-radius: 15px;
+        }
+        .score-display {
+            font-size: 4rem;
+            font-weight: 800;
+            color: #198754;
+            margin: 20px 0;
+        }
+        .notice-box {
+            background-color: #e7f3ff;
+            border-left: 5px solid #007bff;
+            padding: 15px;
+            font-size: 0.95rem;
+            color: #004085;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card result-card shadow-lg text-center p-5">
+        <h2 class="text-dark">Exam Submitted Successfully!</h2>
+        <p class="text-muted">Course: <strong>{{ course }}</strong></p>
+
+        <div class="score-display">
+            {{ score }} / {{ total }}
+        </div>
+
+        <p class="lead">Thank you, <strong>{{ name }}</strong>. Your responses have been securely recorded.</p>
+
+        <div class="notice-box my-4">
+            <strong><i class="bi bi-shield-check"></i> Security Confirmation:</strong><br>
+            Your exam session has ended. It is now <strong>safe to manually close</strong> this browser tab or window.
+        </div>
+
+        <div class="d-grid gap-2">
+            <a href="{% url 'enter_exam' %}" class="btn btn-danger btn-lg">Exit to Home</a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,31 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div id="content-main">
+    <h1>Bulk Upload for: <span style="color: #447e9b;">{{ exam.course_code }}</span></h1>
+
+    <div class="module" style="padding: 20px; background: #fff; border: 1px solid #ccc;">
+        <div style="background: #e7f3fe; border-left: 6px solid #2196F3; padding: 15px; margin-bottom: 25px;">
+            <p style="margin-top: 0;"><strong>Required Format:</strong> To avoid errors, please use our standard structure.</p>
+            <a href="{% url 'admin:download-template' %}" class="button" style="background: #2196F3; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: bold;">
+                Download Excel Template
+            </a>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" action=".">
+            {% csrf_token %}
+            <fieldset class="module aligned">
+                <div class="form-row">
+                    <p style="margin-bottom: 15px;">Supported File: <strong>.xlsx</strong></p>
+                    {{ form.as_p }}
+                </div>
+            </fieldset>
+
+            <div class="submit-row" style="background: none; border: none; padding-left: 0; margin-top: 20px;">
+                <input type="submit" value="Upload Now" class="default" style="background: #28a745; height: 35px; padding: 0 30px;">
+                <a href="../change/" class="closelink" style="margin-left: 20px; vertical-align: middle;">Cancel and Return</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

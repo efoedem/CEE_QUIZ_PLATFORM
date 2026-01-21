@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ exam.course_code }} - Proctored Exam</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { user-select: none; -webkit-user-select: none; background-color: #f4f7f6; overflow-x: hidden; }
+        #timer-sticky { position: fixed; top: 10px; right: 10px; z-index: 2000; }
+        .timer-box { background: #d9534f; color: white; padding: 10px; border-radius: 5px; font-weight: bold; }
+
+        /* Watermark */
+        .watermark {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 4rem; font-weight: bold; color: rgba(0,0,0,0.03); pointer-events: none; z-index: 1000; white-space: nowrap;
+        }
+
+        /* Webcam Feed */
+        #proctor-box {
+            position: fixed; bottom: 10px; left: 10px; width: 160px; border: 3px solid #d9534f; border-radius: 8px; z-index: 2000; background: #000;
+        }
+
+        /* Fullscreen Block */
+        #fullscreen-lock {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 3000; text-align: center; padding-top: 20%;
+        }
+
+        @media print { body { display: none !important; } }
+    </style>
+</head>
+<body>
+
+<div class="watermark">{{ request.session.student_name }} | {{ request.session.index_number }}</div>
+
+<div id="fullscreen-lock">
+    <h1>EXAM PAUSED</h1>
+    <p>Fullscreen mode is required. Do not attempt to switch apps.</p>
+    <button onclick="enterFullscreen()" class="btn btn-success btn-lg">Return to Fullscreen</button>
+</div>
+
+<div id="proctor-box">
+    <video id="webcam" width="160" height="120" autoplay muted></video>
+    <div class="text-white text-center" style="font-size: 10px; background: #d9534f;">LIVE PROCTOR ACTIVE</div>
+</div>
+
+<div id="timer-sticky">
+    <div class="timer-box">Time Left: <span id="time">00:00</span></div>
+</div>
+
+<div class="container my-5" id="exam-area">
+    <div class="col-lg-8 mx-auto">
+        <h2 class="mb-4">Exam: {{ exam.course_code }}</h2>
+        <form id="examForm" method="POST" action="{% url 'submit_exam' %}">
+            {% csrf_token %}
+            <input type="hidden" name="cheat_count" id="cheat_count_input" value="0">
+
+            {% for q in questions %}
+            <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+                    <h5>{{ forloop.counter }}. {{ q.text }}</h5>
+                    {% for i in "1234" %}
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="radio" name="q_{{ q.id }}" value="{{ i }}">
+                        <label class="form-check-label">
+                            {% if i == "1" %}{{ q.option1 }}{% elif i == "2" %}{{ q.option2 }}{% elif i == "3" %}{{ q.option3 }}{% else %}{{ q.option4 }}{% endif %}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-success btn-lg w-100 mt-4">Submit Exam</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    let timeLeft = {{ exam.duration_minutes }} * 60;
+    let cheatCount = 0;
+    const examForm = document.getElementById('examForm');
+
+    // 1. Webcam
+    const video = document.getElementById('webcam');
+    if (navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true }).then(s => video.srcObject = s)
+        .catch(e => { alert("Webcam required!"); window.location.href="/"; });
+    }
+
+    // 2. Timer
+    setInterval(() => {
+        let mins = Math.floor(timeLeft / 60);
+        let secs = timeLeft % 60;
+        document.getElementById('time').textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        if (timeLeft-- <= 0) examForm.submit();
+    }, 1000);
+
+    // 3. Tab Switch & Fullscreen detection
+    function enterFullscreen() {
+        let el = document.documentElement;
+        if (el.requestFullscreen) el.requestFullscreen();
+        document.getElementById('fullscreen-lock').style.display = 'none';
+    }
+
+    document.addEventListener('fullscreenchange', () => {
+        if (!document.fullscreenElement) {
+            document.getElementById('fullscreen-lock').style.display = 'block';
+            document.getElementById('exam-area').style.filter = "blur(15px)";
+        } else {
+            document.getElementById('exam-area').style.filter = "none";
+        }
+    });
+
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+            cheatCount++;
+            document.getElementById('cheat_count_input').value = cheatCount;
+            alert("Warning: Tab switching is logged! (Attempt: " + cheatCount + ")");
+            if (cheatCount >= 3) examForm.submit();
+        }
+    });
+
+    // 4. Block UI actions
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    window.onload = () => { alert("Click OK to enter Fullscreen and start."); enterFullscreen(); };
+</script>
+</body>
+</html>

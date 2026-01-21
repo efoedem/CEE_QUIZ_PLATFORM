@@ -1,0 +1,25 @@
+{% extends "admin/change_form.html" %}
+
+{% block object-tools-items %}
+    <li>
+        <a href="../upload-questions/" class="addlink" style="background-color: #28a745 !important; color: white !important; font-weight: bold; border: 1px solid #1e7e34;">
+            UPLOAD EXCEL QUESTIONS
+        </a>
+    </li>
+    {{ block.super }}
+{% endblock %}
+
+{% block admin_change_form_document_ready %}
+{{ block.super }}
+<script>
+    (function($) {
+        $(document).ready(function() {
+            // Inserts a helpful box right before the manual questions section
+            $('<div style="margin: 20px 0; padding: 15px; background: #e9ecef; border-radius: 5px; border: 1px dashed #28a745;">' +
+              '<strong>Need to Bulk Upload?</strong> ' +
+              '<a href="../upload-questions/" class="button" style="background: #28a745; margin-left: 10px; color: white;">Click here to upload Excel file</a>' +
+              '</div>').insertBefore('#questions-group');
+        });
+    })(django.jQuery);
+</script>
+{% endblock %}

@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: quiz-platform
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn your_project_name.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.13
