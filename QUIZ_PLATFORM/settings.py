@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'users',
     'quiz',
 ]
 
@@ -94,3 +95,6 @@ CSRF_TRUSTED_ORIGINS = [
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 3600
+
+
+AUTH_USER_MODEL = 'users.User'
